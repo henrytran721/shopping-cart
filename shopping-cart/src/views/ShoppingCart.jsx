@@ -84,24 +84,43 @@ const ShoppingCart = () => {
     function addToCart(e) {
         let index = parseInt(e.target.id);
         const addedItem = items.find((item) => item.id === index);
-        setCartVal((prevState) => prevState + 1);
-        setCart((prevState) => [...prevState, addedItem]);
+        const foundInCart = cart.find((item) => item.id === index);
+        // if item is already in cart, increment it in the cart instead of adding another asset
+        if(foundInCart) {
+            foundInCart.quantity += 1;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            console.log(cart);
+        } else {
+            setCartVal((prev) => prev + 1);
+            setCart((prevState) => [...prevState, addedItem]);
+        }
     }
 
+    // componentDidMount runs once and sets desired information where it needs to be
+    useEffect(() => {
+        if(localStorage.getItem('cart')) {
+            var storageCart = localStorage.getItem('cart');
+            storageCart = JSON.parse(storageCart);
+            setCart(storageCart);
+            setCartVal(storageCart.length);
+        }
+    }, [])
+
+    // whenever cart updates, update localStorage
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cart));
-        console.log(localStorage);
     }, [cart])
 
     return (
         <div class='cart-container'>
             <nav>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <a href='/cart'><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-cart" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                 <circle cx="9" cy="19" r="2" />
                 <circle cx="17" cy="19" r="2" />
                 <path d="M3 3h2l2 12a3 3 0 0 0 3 2h7a3 3 0 0 0 3 -2l1 -7h-15.2" />
                 </svg>
+                </a>
                 <p>{cartVal}</p>
             </nav>
             <div className='item-container'>

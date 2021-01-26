@@ -4,6 +4,11 @@ nav {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    
+    svg {
+        cursor: pointer;
+    }
+
     p {
         margin: 0 1%;
         font-weight: bold;
