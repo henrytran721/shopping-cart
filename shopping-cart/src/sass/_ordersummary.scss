@@ -23,6 +23,37 @@
                     max-width: 300px;
                     background: #eee;
                 }
+
+                .order-summary_quantity {
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    svg {
+                        cursor: pointer;
+                    }
+                }
+
+                .order-summary_delete {
+                    background: none;
+                    border: none;
+                    background: #000;
+                    color: white;
+                    padding: 3% 8%;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    transition: all 400ms ease-out;
+
+                    &:hover {
+                        color: black;
+                        background: white;
+                        border: 2px solid black;
+                        box-shadow: 4px 4px 8px rgba(0,0,0,0.25);
+                    }
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
             }
         }
 
