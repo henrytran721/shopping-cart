@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import '../sass/index.scss';
+import CartItem from './CartItem';
 
 const Cart = () => {
     const [cart, setCart] = useState([]);
     const [total, setTotal] = useState(0);
+    const [totalQuantity, setTotalQuantity] = useState(0);
     useEffect(() => {
         if(localStorage.getItem('cart')) {
             const storageCart = JSON.parse(localStorage.getItem('cart'));
@@ -13,12 +15,15 @@ const Cart = () => {
 
     useEffect(() => {
         var sum = 0;
+        var total = 0;
         if(cart.length) {
             cart.map((item) => {
                 sum += item.quantity * item.price;
+                total += item.quantity;
             })
         }
         setTotal(sum);
+        setTotalQuantity(total);
     })
 
     useEffect(() => {
@@ -28,6 +33,23 @@ const Cart = () => {
     function handleDelete(e)  {
         const index = parseInt(e.target.id);
         setCart(prevCart => prevCart.filter((item) => item.id !== index));
+    }
+
+    function getData(data) {
+        // extract data from child component in order to update quantity in state
+        let currentItem = data.item;
+        let index = data.index;
+        currentItem.quantity = data.quantity;
+
+        setCart((prevState) => {
+            if(index === 0) {
+                return [currentItem, ...prevState.slice(1)];
+            } else if(index === prevState.length - 1) {
+                return [...prevState.slice(0, index), currentItem];
+            } else {
+                return [...prevState.slice(0, index), currentItem, ...prevState.slice(index + 1)]
+            }
+           })
     }
 
     return (
@@ -49,37 +71,14 @@ const Cart = () => {
                     <h2>Your Cart</h2>
                     {cart.map((item, index) => {
                         return (
-                            <div class='order-summary_shoe' key={index}>
-                                <img src={item.img} />
-                                <div class='order-summary_description'>
-                                    <h3>{item.model}</h3>
-                                    <p>${item.price}</p>
-                                    <div className='order-summary_quantity'>
-                                    <span>
-                                        <svg id={index} xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-minus" width="25" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                        </svg>
-                                    </span>
-                                    <p>{item.quantity}</p>
-                                    <span>
-                                        <svg id={index} xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="25" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <line x1="12" y1="5" x2="12" y2="19" />
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                        </svg>
-                                    </span>
-                                    </div>
-                                    <button id={item.id} className='order-summary_delete' onClick={handleDelete}>Delete</button>
-                                </div>
-                            </div>
+                            <CartItem item={item} handleDelete={handleDelete} index={index} getData={getData} />
                         )
                     })}
                 </div>
                 <div class='order-summary_total'>
                     <h2>Order Total</h2>
                     <div class='total-item-price'>
-                        {cart.length === 1 ? <p>1 Item</p> : <p>{cart.length} Items</p>}
+                        {cart.length === 1 ? <p>1 Item</p> : <p>{totalQuantity} Items</p>}
                         <p>${total}</p>
                     </div>
                     <div class='total-summary'>
@@ -88,7 +87,21 @@ const Cart = () => {
                     </div>
                 </div>
             </div>
-            </div> : 'hello'}
+            </div> : 
+            <div className='empty-cart'>
+                <nav>
+                    <a href='/'>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <polyline points="5 12 3 12 12 3 21 12 19 12" />
+                        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                        </svg>
+                    </a>
+                </nav>
+                <p>There doesn't seem to be anything in your cart. Please add something and try again.</p>
+            </div>
+            }
         </div>
     )
 }
